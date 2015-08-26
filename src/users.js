@@ -3,32 +3,83 @@ var async = require('async');
 module.exports = function Users(db) {
 
 	/**
-	 * Add User Key
-	 * @param {string}   name   User Name
-	 * @param {hash}   pubkey Public Key
-	 * @param {Function} done   callback
+	 * Create User Credentials
+	 * @param  {string}   name User Name
+	 * @param  {string}   pass Password
+	 * @param  {Function} done Callback
 	 */
-	function addUser(name, pubkey, done) {
-		
+	function createUser(name, pass, done) {
 		async.waterfall([
 			// Check if Name is Valid
-			function validName() {
+			function isvalidName() {
 				if(name && typeof name == 'string'){
 					done()
 				} else {
 					done(Error('Invalid Name'))
 				}
 			},
-			// Check if PubKey is Valid
-			function validKey() {
-				if(pubkey && typeof pubkey == 'number'){
+			// Make Key
+			function makeKeyHash() {
+				if(pass){
+					// Use Password
+					// to Generate Key
+					// TODO
+					var hash;
+					done(null, hash)
+				} else {
+					done(Error('Invalid Password'))
+				}
+			},
+			// Pass Credentials
+			function passCred(key) {
+				done(null, {name, key})
+			}
+		], done)
+	};
+
+	/**
+	 * Check User Cred
+	 * @param  {string} name User Name
+	 * @param  {number} key  Key
+	 * @return {bool}   	 True if User is Valid
+	 */
+	function checkUser(name, key) {
+		db.get(name, function(err, val) {
+			if(!err && key === val){
+				return true;
+			} else {
+				return false;
+			}
+		})
+	};
+
+	/**
+	 * Add User Key
+	 * @param {string}	 name   User Name
+	 * @param {hash}	 key Public Key
+	 * @param {Function} done   callback
+	 */
+	function addUser(name, key, done) {
+		
+		async.waterfall([
+			// Check if Name is Valid
+			function isvalidName() {
+				if(name && typeof name == 'string'){
+					done()
+				} else {
+					done(Error('Invalid Name'))
+				}
+			},
+			// Check if Key is Valid
+			function isvalidKey() {
+				if(key && typeof key == 'number'){
 					done()
 				} else {
 					done(Error('Invalid Public Key'))
 				}
 			},
 			function addUser() {
-				db.put(name, pubkey, done)
+				db.put(name, key, done)
 			}], done )
 	};
 
