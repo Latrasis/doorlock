@@ -11,7 +11,7 @@ module.exports = function Users(db) {
 	function createUser(name, pass, done) {
 		async.waterfall([
 			// Check if Name is Valid
-			function isvalidName() {
+			function isvalidName(done) {
 				if(name && typeof name == 'string'){
 					done()
 				} else {
@@ -19,7 +19,7 @@ module.exports = function Users(db) {
 				}
 			},
 			// Make Key
-			function makeKeyHash() {
+			function makeKeyHash(done) {
 				if(pass){
 					// Use Password
 					// to Generate Key
@@ -31,7 +31,7 @@ module.exports = function Users(db) {
 				}
 			},
 			// Pass Credentials
-			function passCred(key) {
+			function passCred(key, done) {
 				done(null, {name, key})
 			}
 		], done)
@@ -43,14 +43,16 @@ module.exports = function Users(db) {
 	 * @param  {number} key  Key
 	 * @return {bool}   	 True if User is Valid
 	 */
-	function checkUser(name, key) {
-		db.get(name, function(err, val) {
-			if(!err && key === val){
-				return true;
-			} else {
-				return false;
-			}
-		})
+	function checkUser(name, pass, done) {
+		async.waterfall([
+			function findUser(done) {
+				db.get(name, done)
+			},
+			function checkKey(key, done) {
+				// Hash Password and Check if they Match
+				// TODO
+				done();
+			}], done)
 	};
 
 	/**
@@ -63,7 +65,7 @@ module.exports = function Users(db) {
 		
 		async.waterfall([
 			// Check if Name is Valid
-			function isvalidName() {
+			function isvalidName(done) {
 				if(name && typeof name == 'string'){
 					done()
 				} else {
@@ -71,14 +73,14 @@ module.exports = function Users(db) {
 				}
 			},
 			// Check if Key is Valid
-			function isvalidKey() {
+			function isvalidKey(done) {
 				if(key && typeof key == 'number'){
 					done()
 				} else {
 					done(Error('Invalid Public Key'))
 				}
 			},
-			function addUser() {
+			function addUser(done) {
 				db.put(name, key, done)
 			}], done )
 	};
