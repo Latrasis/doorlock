@@ -1,11 +1,9 @@
 var async = require('async')
 var express = require('express')
-var levelup = require('levelup')
+var glob = require('glob')
 
 var app = express()
 var db = levelup('./db')
-
-var Lock = require('./src/lock.js')
 
 // Set Middleware
 app.use('/', function(req, res, next) {
@@ -19,6 +17,4 @@ routes.forEach(function (route) {
 	require(route)(app);
 });
 
-Lock.input.watch(function(err, value) {	
-	Lock.toggle.writeSync(value);
-});
+app.listen(8000);
