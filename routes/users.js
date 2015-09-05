@@ -39,7 +39,7 @@ router.get('/', function(req, res) {
 });
 
 // Create User
-router.put('/', function(req, res) {
+router.post('/', function(req, res) {
 
 	var username = req.body["username"];
 	var pass = req.body["password"];
